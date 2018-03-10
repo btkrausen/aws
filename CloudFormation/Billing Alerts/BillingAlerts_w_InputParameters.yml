@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Billing Alerts for AWS Account - uses Input Parameters for alarm thresholds'
+
+Parameters:
+
+  EmailAddress:
+    Type: String
+    Description: "Enter email address for billing alerts"
+    AllowedPattern: ^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$
+  AlarmThresholds:
+    Type: CommaDelimitedList
+    Description: "Enter five (5) values for the billing alarms (e.g., 1,5,10,20,50)"
+
+Resources:
+
+  BillingAlertFiveDollars:
+    Type: AWS::CloudWatch::Alarm
+    DependsOn: BillingAlertTopic
+    Properties:
+      AlarmActions:
+        - !Ref BillingAlertTopic
+      AlarmDescription: !Join ["", ["Account Billing Alert for $", !Select [0, !Ref AlarmThresholds], ".00"]]
+      AlarmName: !Join ["", ["Billing Alert - Estimated Bill Exceeds $", !Select [0, !Ref AlarmThresholds]]]
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: Currency
+          Value: USD
+      EvaluationPeriods: 1
+      MetricName: EstimatedCharges
+      Namespace: AWS/Billing
+      Period: 21600
+      Statistic: Maximum
+      Threshold: !Select [0, !Ref AlarmThresholds]
+
+  BillingAlertTenDollars:
+    Type: AWS::CloudWatch::Alarm
+    DependsOn: BillingAlertTopic
+    Properties:
+      AlarmActions:
+        - !Ref BillingAlertTopic
+      AlarmDescription: !Join ["", ["Account Billing Alert for $", !Select [1, !Ref AlarmThresholds], ".00"]]
+      AlarmName: !Join ["", ["Billing Alert - Estimated Bill Exceeds $", !Select [1, !Ref AlarmThresholds]]]
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: Currency
+          Value: USD
+      EvaluationPeriods: 1
+      MetricName: EstimatedCharges
+      Namespace: AWS/Billing
+      Period: 21600
+      Statistic: Maximum
+      Threshold: !Select [1, !Ref AlarmThresholds]
+
+  BillingAlertTwentyDollars:
+    Type: AWS::CloudWatch::Alarm
+    DependsOn: BillingAlertTopic
+    Properties:
+      AlarmActions:
+        - !Ref BillingAlertTopic
+      AlarmDescription: !Join ["", ["Account Billing Alert for $", !Select [2, !Ref AlarmThresholds], ".00"]]
+      AlarmName: !Join ["", ["Billing Alert - Estimated Bill Exceeds $", !Select [2, !Ref AlarmThresholds]]]
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: Currency
+          Value: USD
+      EvaluationPeriods: 1
+      MetricName: EstimatedCharges
+      Namespace: AWS/Billing
+      Period: 21600
+      Statistic: Maximum
+      Threshold: !Select [2, !Ref AlarmThresholds]
+
+  BillingAlertThirtyDollars:
+    Type: AWS::CloudWatch::Alarm
+    DependsOn: BillingAlertTopic
+    Properties:
+      AlarmActions:
+        - !Ref BillingAlertTopic
+      AlarmDescription: !Join ["", ["Account Billing Alert for $", !Select [3, !Ref AlarmThresholds], ".00"]]
+      AlarmName: !Join ["", ["Billing Alert - Estimated Bill Exceeds $", !Select [3, !Ref AlarmThresholds]]]
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: Currency
+          Value: USD
+      EvaluationPeriods: 1
+      MetricName: EstimatedCharges
+      Namespace: AWS/Billing
+      Period: 21600
+      Statistic: Maximum
+      Threshold: !Select [3, !Ref AlarmThresholds]
+
+  BillingAlertFourtyDollars:
+    Type: AWS::CloudWatch::Alarm
+    DependsOn: BillingAlertTopic
+    Properties:
+      AlarmActions:
+        - !Ref BillingAlertTopic
+      AlarmDescription: !Join ["", ["Account Billing Alert for $", !Select [4, !Ref AlarmThresholds], ".00"]]
+      AlarmName: !Join ["", ["Billing Alert - Estimated Bill Exceeds $", !Select [4, !Ref AlarmThresholds]]]
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: Currency
+          Value: USD
+      EvaluationPeriods: 1
+      MetricName: EstimatedCharges
+      Namespace: AWS/Billing
+      Period: 21600
+      Statistic: Maximum
+      Threshold: !Select [4, !Ref AlarmThresholds]
+
+  BillingAlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: "Billing-Alerts"
+      Subscription:
+      - Endpoint: !Ref EmailAddress
+        Protocol: email
