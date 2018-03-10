@@ -6,6 +6,8 @@ For somebody new to AWS, or a lab environment, Billing Alerts are a necessity to
 
 The simplest way to deploy the template is to use the CloudFormation [console](https://console.aws.amazon.com/cloudformation). The console will prompt you to enter your email address for the **EmailAddress** parameter and will automatically subscribe you to the SNS topic. You will need to confirm the subscription by clicking the link in the initial email received.
 
+**As AWS Billing is only handled in N. Virginia, you must run this template in US-East-1**
+
 ### Prerequisites
 
 The account deploying the CloudFormation template needs to have an appropriate IAM policy attached that permits you to create CloudFormation stacks, create SNS topics, and create CloudWatch alarms.
