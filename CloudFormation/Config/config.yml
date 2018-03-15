@@ -1,27 +1,26 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: 'Config Rule to ensure that S3 buckets are not pubically accessible'
-
+Description: 'AWS Config Rule to ensure that S3 buckets are not pubically accessible'
 
 Parameters:
 
   IsConfigInUse:
     Type: String
-    Description: "Is AWS Config in use in your account already? Enter true or false"
+    Description: "Is AWS Config in use in your account already? Enter True or False"
     AllowedValues:
-      - yes
-      - no
+      - true
+      - false
   ConfigBucketName:
     Type: String
-    Description: "Name of bucket that Config will use for logs"
+    Description: "Name of bucket that AWS Config will use for logs"
     AllowedPattern: ^([a-z]|(\d(?!\d{0,2}\.\d{1,3}\.\d{1,3}\.\d{1,3})))([a-z\d]|(\.(?!(\.|-)))|(-(?!\.))){1,61}[a-z\d\.]$
   EmailAddress:
     Type: String
-    Description: "Enter email address for Config alerts"
+    Description: "Enter email address for AWS Config alerts"
     AllowedPattern: ^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$
 
 Conditions:
 
-  ConfigDoesNotExist: !Equals [!Ref IsConfigInUse, "no"]
+  ConfigDoesNotExist: !Equals [!Ref IsConfigInUse, "false"]
 
 Resources:
 
