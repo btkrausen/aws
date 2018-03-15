@@ -3,17 +3,20 @@ Description: 'Billing Alerts for AWS Account - uses Input Parameters for alarm t
 
 Parameters:
 
+#Email Address used for SNS Topic subscription for Billing Alerts
   EmailAddress:
     Type: String
     Description: "Enter email address for billing alerts"
     AllowedPattern: ^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$
+#Numerical Thresholds - in $USD - for Billing alarms
   AlarmThresholds:
     Type: CommaDelimitedList
     Description: "Enter five (5) values for the billing alarms (e.g., 1,5,10,20,50)"
 
 Resources:
 
-  BillingAlertFiveDollars:
+#Create Billing Alerts based upon Parameter Thresholds
+  BillingAlertOne:
     Type: AWS::CloudWatch::Alarm
     DependsOn: BillingAlertTopic
     Properties:
@@ -32,7 +35,7 @@ Resources:
       Statistic: Maximum
       Threshold: !Select [0, !Ref AlarmThresholds]
 
-  BillingAlertTenDollars:
+  BillingAlertTwo:
     Type: AWS::CloudWatch::Alarm
     DependsOn: BillingAlertTopic
     Properties:
@@ -51,7 +54,7 @@ Resources:
       Statistic: Maximum
       Threshold: !Select [1, !Ref AlarmThresholds]
 
-  BillingAlertTwentyDollars:
+  BillingAlertThree:
     Type: AWS::CloudWatch::Alarm
     DependsOn: BillingAlertTopic
     Properties:
@@ -70,7 +73,7 @@ Resources:
       Statistic: Maximum
       Threshold: !Select [2, !Ref AlarmThresholds]
 
-  BillingAlertThirtyDollars:
+  BillingAlertFour:
     Type: AWS::CloudWatch::Alarm
     DependsOn: BillingAlertTopic
     Properties:
@@ -89,7 +92,7 @@ Resources:
       Statistic: Maximum
       Threshold: !Select [3, !Ref AlarmThresholds]
 
-  BillingAlertFourtyDollars:
+  BillingAlertFive:
     Type: AWS::CloudWatch::Alarm
     DependsOn: BillingAlertTopic
     Properties:
@@ -108,6 +111,7 @@ Resources:
       Statistic: Maximum
       Threshold: !Select [4, !Ref AlarmThresholds]
 
+#Create SNS Topic and Subscribe Email Address
   BillingAlertTopic:
     Type: AWS::SNS::Topic
     Properties:
