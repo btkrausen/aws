@@ -40,11 +40,6 @@ Resources:
     DependsOn:
       - WindowsRDPSecurityGroup
     Properties:
-      AvailabilityZone:
-        Fn::Select:
-        - '0'
-        - Fn::GetAZs:
-            Ref: AWS::Region
       ImageId: !FindInMap [WindowsServer, !Ref "AWS::Region", AMI]
       InstanceType: t2.medium
       KeyName: !Ref EC2KeyPair
