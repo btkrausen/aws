@@ -1,12 +1,28 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: 'Billing Alerts for AWS Account - uses Input Parameters for alarm thresholds'
 
+Metadata:
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "Alarm Configuration"
+        Parameters:
+          - EmailAddress
+          - AlarmThresholds
+    ParameterLabels:
+      EmailAddress:
+        default: "What's your email address?"
+      AlarmThresholds:
+        default: "What dollar amounts to alert on?"
+
 Parameters:
 
 #Email Address used for SNS Topic subscription for Billing Alerts
   EmailAddress:
     Type: String
-    Description: "Enter email address for billing alerts"
+    Description: "Enter your email address for billing alerts"
     AllowedPattern: ^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$
 #Numerical Thresholds - in $USD - for Billing alarms
   AlarmThresholds:
