@@ -18,6 +18,7 @@ Metadata:
         Parameters:
           - EC2KeyPair
           - UnderlyingOS
+          - InstanceSize
 
     ParameterLabels:
       VpcId:
@@ -30,6 +31,8 @@ Metadata:
         default: "Where will you be connecting from?"
       UnderlyingOS:
         default: "What OS should be deployed?"
+      InstanceSize:
+        default: "What size instance?"
 
 
 Parameters:
@@ -58,7 +61,15 @@ Parameters:
     AllowedValues:
       - Linux
       - Windows
-
+  InstanceSize:
+    Type: String
+    Description: Select an instance size
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      
 Mappings:
 
   Windows:
@@ -95,7 +106,7 @@ Resources:
       - WindowsRDPSecurityGroup
     Properties:
       ImageId: !FindInMap [Windows, !Ref "AWS::Region", AMI]
-      InstanceType: t2.small
+      InstanceType: !Ref InstanceSize
       KeyName: !Ref EC2KeyPair
       NetworkInterfaces:
         - AssociatePublicIpAddress: "true"
@@ -132,7 +143,7 @@ Resources:
       - LinuxSSHSecurityGroup
     Properties:
       ImageId: !FindInMap [Linux, !Ref "AWS::Region", AMI]
-      InstanceType: t2.small
+      InstanceType: !Ref InstanceSize
       KeyName: !Ref EC2KeyPair
       NetworkInterfaces:
         - AssociatePublicIpAddress: "true"
