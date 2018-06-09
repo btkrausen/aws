@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: WorkSpaces Template
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "WorkSpace Configuration"
+        Parameters:
+          - Bundle
+          - Directory
+          - User
+          - EncryptionKey
+    ParameterLabels:
+      Bundle:
+        default: "WorkSpace Bundle"
+      Directory:
+        default: "WorkSpace Directory"
+      User:
+        default: "WorkSpace Owner"
+      EncryptionKey:
+        default: "Encryption Key"
+
+Parameters:
+
+  Bundle:
+    Type: String
+    Description: Select the bundle that should be deployed
+    Default: "wsb-xxxxx"
+  Directory:
+    Type: String
+    Description: Enter the Directory ID for the WorkSpace (Directory Services or AD Connector)
+    Default: "d-xxxxxx"
+  User:
+    Type: String
+    Description: Enter the username who will use the WorkSpace
+    AllowedPattern: ^[a-z0-9]{1,20}$
+    ConstraintDescription: user must be entered using lower case letters and numbers and a maximum of 20 characters
+  EncryptionKey:
+    Type: String
+    Description: Select the KMS encryption key to encrypt WorkSpace volumes
+    Default: "arn:aws:kms:us-east-1:xxxxxxxxxx:key/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+Resources:
+
+  WorkSpace:
+    Type: AWS::WorkSpaces::Workspace
+    Properties:
+      BundleId: !Ref Bundle
+      DirectoryId: !Ref Directory
+      UserName: !Ref User
+      RootVolumeEncryptionEnabled: 'true'
+      UserVolumeEncryptionEnabled: 'true'
+      VolumeEncryptionKey: !Ref EncryptionKey
+
+Outputs:
+  WorkSpaceId:
+    Description: ID of the WorkSpaces
+    Value: !Ref WorkSpace
