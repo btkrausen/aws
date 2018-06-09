@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Deploys Directory Service for Amazon Workspaces Quickstart'
+
+Parameters:
+#Define specifics for DirectoryService creation
+  CompanyName:
+    Type: String
+    Description: Name of the company to prepend to the domain for Directory Services
+  DomainPassword:
+    Type: String
+    Default: Passw0rd1
+    NoEcho: True
+    Description: Password for administrator account
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID to deploy Directory Service
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Private Subnet 1 ID for Directory Service
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Private Subnet 2 ID for Directory Service
+
+Resources:
+  Directory:
+    Type: AWS::DirectoryService::MicrosoftAD
+    Properties:
+      Name: !Join [".", !Ref CompanyName, "workspaces.local"]
+      Password:
+        !Ref DomainPassword
+      VpcSettings:
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+        VpcId: !Ref VPCId
+
+Outputs:
+  DirectoryID:
+    Description: Outputs the ID of the Directory Service
+    Value: !Ref Directory
+  DNSservers:
+    Description: Outputs the IP addresses of the DNS servers
+    Value:
+      Fn::Join:
+      - ","
+      - Fn::GetAtt:
+        - Directory
+        - DnsIpAddresses
