@@ -1,0 +1,194 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Proof of Concept template
+
+Parameters:
+  VpcName:
+    Type: String
+    Default: "Krausen-PoC"
+
+Mappings:
+  VpcCidrBlocks:
+    us-east-1:
+      Default: 10.0.0.0/16
+    us-east-2:
+      Default: 10.0.0.0/16
+
+  VpcSubnets:
+    us-east-1:
+      PrivateAz1: 10.0.0.0/24
+      PrivateAz2: 10.0.1.0/24
+      PublicAz1: 10.0.10.0/24
+      PublicAz2: 10.0.11.0/24
+    us-east-2:
+      PrivateAz1: 10.0.0.0/24
+      PrivateAz2: 10.0.1.0/24
+      PublicAz1: 10.0.10.0/24
+      PublicAz2: 10.0.11.0/24
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !FindInMap [VpcCidrBlocks, !Ref "AWS::Region", Default]
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      InstanceTenancy: default
+      Tags:
+      - Key: Name
+        Value: !Ref VpcName
+
+  PrivateSubnetAz1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '0'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock: !FindInMap [VpcSubnets, !Ref "AWS::Region", PrivateAz1]
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+      - Key: Name
+        Value: PrivateSubnet-AZ1
+      VpcId: !Ref VPC
+
+  PrivateSubnetAz2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '1'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock: !FindInMap [VpcSubnets, !Ref "AWS::Region", PrivateAz2]
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+      - Key: Name
+        Value: PrivateSubnet-AZ2
+      VpcId: !Ref VPC
+
+  PublicSubnetAz1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '0'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock: !FindInMap [VpcSubnets, !Ref "AWS::Region", PublicAz1]
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+      - Key: Name
+        Value: PublicSubnet-AZ1
+      VpcId: !Ref VPC
+
+  PublicSubnetAz2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '1'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock: !FindInMap [VpcSubnets, !Ref "AWS::Region", PublicAz2]
+      MapPublicIpOnLaunch: 'false'
+      Tags:
+      - Key: Name
+        Value: PublicSubnet-AZ2
+      VpcId: !Ref VPC
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        !Ref VPC
+      Tags:
+      - Key: Name
+        Value: Public-Route-Table
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        !Ref VPC
+      Tags:
+      - Key: Name
+        Value: Private-Route-Table
+
+  PrivateRouteTableAssociationAZ1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        !Ref PrivateSubnetAz1
+      RouteTableId:
+        !Ref PrivateRouteTable
+
+  PrivateRouteTableAssociationAZ2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        !Ref PrivateSubnetAz2
+      RouteTableId:
+        !Ref PrivateRouteTable
+
+  PublicRouteTableAssociationAZ1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        !Ref PublicSubnetAz1
+      RouteTableId:
+        !Ref PublicRouteTable
+
+  PublicRouteTableAssociationAZ2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        !Ref PublicSubnetAz2
+      RouteTableId:
+        !Ref PublicRouteTable
+
+  PublicSubnetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway
+    Properties:
+      RouteTableId:
+        !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        !Ref InternetGateway
+
+  PrivateSubnetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId:
+        !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        !Ref NATGateway
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: Krausen-IGW
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  NatGatewayEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: "VPC"
+
+  NATGateway:
+    DependsOn: NatGatewayEIP
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        !GetAtt NatGatewayEIP.AllocationId
+      SubnetId:
+        !Ref PublicSubnetAz1
