@@ -65,7 +65,7 @@ Resources:
           SubnetId: !Ref InstanceSubnet
           GroupSet:
             - !Ref SecGroup
-          PrivateIpAddress: 10.0.11.80/32
+          PrivateIpAddress: 10.0.11.80
       Tags:
       - Key: "Name"
         Value: "Vault-Master-Node"
