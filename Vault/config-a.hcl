@@ -8,8 +8,8 @@ storage "dynamodb" {
   recovery_mode=1
 }
 listener "tcp" {
- address = "10.0.11.94:8200"
+ address = "10.0.11.80:8200"
  tls_disable = 1
 }
 disable_mlock = true
-api_addr = "http://10.0.11.94:8200"
+api_addr = "http://10.0.11.80:8200"

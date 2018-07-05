@@ -65,6 +65,10 @@ Resources:
           SubnetId: !Ref InstanceSubnet
           GroupSet:
             - !Ref SecGroup
+          PrivateIpAddress: 10.0.11.80/32
+      Tags:
+      - Key: "Name"
+        Value: "Vault-Master-Node"
       UserData:
         Fn::Base64:
           !Sub |
@@ -76,5 +80,5 @@ Resources:
             unzip vault_0.10.2_linux_amd64.zip
             sudo rm vault_0.10.2_linux_amd64.zip
             export PATH=$PATH:/usr/local/bin
-            wget https://raw.githubusercontent.com/btkrausen/AWS/master/Vault/config.hcl
-            vault server -config=config.hcl
+            wget https://raw.githubusercontent.com/btkrausen/AWS/master/Vault/config-a.hcl
+            vault server -config=config-a.hcl
