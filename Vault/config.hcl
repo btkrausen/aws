@@ -1,4 +1,5 @@
 storage "dynamodb" {
+  ha_enabled = true
   max_parallel = 128
   region = "us-east-1"
   table = "Vault-Backend"
@@ -6,7 +7,7 @@ storage "dynamodb" {
   write_capacity = 15
 }
 listener "tcp" {
- address     = "127.0.0.1:8200"
+ address     = "10.0.11.90:8200"
  tls_disable = 1
 }
 disable_mlock = true
