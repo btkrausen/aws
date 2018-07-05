@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Proof of Concept template
+Description: Proof of Concept VPC template
 
 Parameters:
   VpcName:
     Type: String
-    Default: "Krausen-PoC"
+    Default: "Krausen VPC"
 
 Mappings:
   VpcCidrBlocks:

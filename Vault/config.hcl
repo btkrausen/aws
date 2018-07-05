@@ -1,5 +1,4 @@
 storage "dynamodb" {
-  ha_enabled = "true"
   max_parallel = 128
   region = "us-east-1"
   table = "Vault-Backend"

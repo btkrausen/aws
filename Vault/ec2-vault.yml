@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: HashiCorp Vault EC2 Linux Template
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.medium
+  AMI:
+    Type: String
+    Default: ami-b70554c8
+  InstanceSubnet:
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-29a8084e
+
+Resources:
+
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+      RoleName: Vault-DynamoDB-Access
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref InstanceRole
+      InstanceProfileName: DynamoDBInstanceProfile
+
+  SecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows ports inbound for SSH
+      GroupName: krausen-ssh-home
+      VpcId: vpc-004ea47a
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: "12.172.230.255/32"
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      InstanceType: !Ref InstanceType
+      InstanceInitiatedShutdownBehavior: stop
+      ImageId: !Ref AMI
+      KeyName: Krausen-US-East-1-Demo
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeleteOnTermination: true
+          DeviceIndex: "0"
+          SubnetId: !Ref InstanceSubnet
+          GroupSet:
+            - !Ref SecGroup
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #! /bin/bash -xe
+            builtin cd /usr/local/bin/
+            wget https://releases.hashicorp.com/vault/0.10.2/vault_0.10.2_linux_amd64.zip
+            wget https://releases.hashicorp.com/vault/0.10.2/vault_0.10.2_SHA256SUMS
+            sha256sum -c vault_0.10.2_SHA256SUMS 2>&1 | grep OK
+            unzip vault_0.10.2_linux_amd64.zip
+            sudo rm vault_0.10.2_linux_amd64.zip
+            export PATH=$PATH:/usr/local/bin
+            wget https://raw.githubusercontent.com/btkrausen/AWS/master/Vault/config.hcl
+            vault server -config=config.hcl
