@@ -1,0 +1,35 @@
+{
+  "Version": "2012-10-17",
+  "Id": "SecureS3BucketPolicy",
+  "Statement": [
+    {
+      "Sid": "EnforceTLS",
+      "Effect": "Deny",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": ["s3:*"],
+      "Resource": [
+        "arn:aws:s3:::amazons3deepdive/*",
+        "arn:aws:s3:::amazons3deepdive"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    },
+    {
+      "Sid": "AllowBryanS3Access",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::001234567890:user/btkrausen"
+      },
+      "Action": ["s3:PutObject"],
+      "Resource": [
+        "arn:aws:s3:::amazons3deepdive/*",
+        "arn:aws:s3:::amazons3deepdive"
+      ]
+    }
+  ]
+}

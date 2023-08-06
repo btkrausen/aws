@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "S3 Bucket Template"
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "S3 Bucket Parameters"
+        Parameters:
+          - BucketName
+          - KmsKeyArn
+
+    ParameterLabels:
+        BucketName:
+          default: "Enter your S3 Bucket Name here"
+        KmsKeyArn:
+          default: "Enter the ARN of the KMS key used for object encryption (SSE-KMS)"
+
+Parameters:
+  KmsKeyArn:
+    Description: "The KMS Key ARN to be used for object encryption (SSE-KMS)"
+    Type: String
+    AllowedPattern: "^arn:aws:kms:[a-z0-9-]+:[0-9]{12}:key/[a-zA-Z0-9-_]+$"
+
+  BucketName:
+    Description: "The desired bucket name"
+    Type: String
+    AllowedPattern: "^[a-z0-9][a-z0-9.-]{3,63}[a-z0-9]$"
+
+Resources:
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      AccessControl: Private
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration:
+          - BucketKeyEnabled: true
+            ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref KmsKeyArn
+      BucketName: !Ref BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: false
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: false
+      Tags: 
+        - Key: CloudFormation
+          Value: true
+        - Key: Data
+          Value: secret
+      VersioningConfiguration: 
+        Status: Enabled

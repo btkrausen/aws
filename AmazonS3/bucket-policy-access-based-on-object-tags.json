@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Id": "ExamplePolicy",
+  "Statement": [
+    {
+      "Sid": "AllowAccessToDevObjects",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::001234567890:user/bryan"
+      },
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::amazons3deepdive/*",
+      "Condition": {
+        "StringEquals": {
+          "s3:ExistingObjectTag/environment": "development"
+        }
+      }
+    }
+  ]
+}

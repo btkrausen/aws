@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Id": "ExamplePolicy",
+  "Statement": [
+    {
+      "Sid": "AllowListBucket",
+      "Effect": "Allow",
+      "Action": "s3:ListAllMyBuckets",
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowAccessToObjects",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:GetObjectTagging"
+      ],
+      "Resource": "arn:aws:s3:::amazons3deepdive/*"
+    }
+  ]
+}

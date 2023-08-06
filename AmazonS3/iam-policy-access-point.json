@@ -1,0 +1,15 @@
+{
+    "Version":"2012-10-17",
+    "Statement": [
+    {
+        "Effect": "Allow",
+        "Principal": {
+            "AWS": "arn:aws:iam::123456789012:user/bryan"
+        },
+        "Action": [
+            "s3:GetObject",
+            "s3:PutObject"
+        ],
+        "Resource": "arn:aws:s3:us-east-1:123456789012:accesspoint/prod-access-point/object/prod/*"
+    }]
+}

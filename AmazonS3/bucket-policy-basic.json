@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowReadAndWrite",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::603991114860:user/doug"
+      },
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::amazons3deepdive/*",
+      "Condition": {
+        "StringEquals": {
+          "s3:ExistingObjectTag/environment": "development"
+        }
+      }
+    }
+  ]
+}
